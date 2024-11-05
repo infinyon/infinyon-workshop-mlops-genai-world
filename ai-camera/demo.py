@@ -34,6 +34,10 @@ while True:
         if label == "person" and confidence > 0.4:
             producer.send_string(f"Person detected with {confidence:.2f} confidence!")
             producer.flush()
+        else:
+            producer.send_string(f"{label} detected with {confidence:.2f} confidence!")
+            producer.flush()
+
 
     
     # Small delay to prevent overwhelming the system
