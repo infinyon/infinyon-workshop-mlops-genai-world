@@ -1,8 +1,9 @@
 #!/usr/bin/env python
-
-from ai_camera import IMX500Detector
 import time
+import json
+from datetime import datetime
 from fluvio import Fluvio
+from ai_camera import IMX500Detector
 
 camera = IMX500Detector()
 
@@ -12,7 +13,7 @@ PARTITION = 0
 fluvio = Fluvio.connect()
 print(f"Connected to fluvio")
 producer = fluvio.topic_producer(TOPIC_NAME)
-print(f"Created fluvio producer")
+print(f"Created fluvio producer to: {TOPIC_NAME}")
 
 # Start the detector with preview window
 camera.start(show_preview=True)
@@ -29,14 +30,18 @@ while True:
     for detection in detections:
         label = labels[int(detection.category)]
         confidence = detection.conf
-        
-        # Example: Print when a person is detected with high confidence
-        if label == "person" and confidence > 0.4:
-            producer.send_string(f"Person detected with {confidence:.2f} confidence!")
-            producer.flush()
-        else:
-            producer.send_string(f"{label} detected with {confidence:.2f} confidence!")
-            producer.flush()
+
+        event_time  = datetime.now().isoformat()
+        record = {
+            "label": label,
+            "confidence": float(confidence),
+            "time": event_time
+        }
+
+        output = json.dumps(record)
+
+        producer.send_string(output)
+        producer.flush()
 
 
     
