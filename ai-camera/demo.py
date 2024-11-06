@@ -7,7 +7,7 @@ from ai_camera import IMX500Detector
 
 camera = IMX500Detector()
 
-TOPIC_NAME = "objects"
+TOPIC_NAME = "input-objects"
 PARTITION = 0
 
 fluvio = Fluvio.connect()
