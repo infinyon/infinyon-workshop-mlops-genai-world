@@ -1,0 +1,30 @@
+{
+    "label": "toilet",
+    "confidence": 0.73046875,
+    "time": "2024-11-05T16:50:08.580410"
+}
+{
+    "label": "toilet",
+    "confidence": 0.6796875,
+    "time": "2024-11-05T16:50:08.889913"
+}
+{
+    "label": "toilet",
+    "confidence": 0.6796875,
+    "time": "2024-11-05T16:50:09.301235"
+}
+{
+    "label": "toilet",
+    "confidence": 0.6796875,
+    "time": "2024-11-05T16:50:09.406597"
+}
+{
+    "label": "mouse",
+    "confidence": 0.5625,
+    "time": "2024-11-05T16:50:11.145732"
+}
+{
+    "label": "mouse",
+    "confidence": 0.5625,
+    "time": "2024-11-05T16:50:11.353154"
+}
