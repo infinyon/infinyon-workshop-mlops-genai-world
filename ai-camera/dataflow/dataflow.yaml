@@ -23,8 +23,32 @@ types:
       time:
         type: string
 
+  label-request:
+    type: object
+    properties:
+      label:
+        type: string
+      confidence:
+        type: f32
+
+  label-confidence-output:
+    type: arrow-row
+    properties:
+      avg-confidence:
+        type: f32
+      count:
+        type: u32
+
+
 
 topics:
+
+  label-request:
+    name: label-request
+    schema:
+      value:
+        type: label-request
+
   input-object:
     name: input-objects
     schema:
@@ -37,6 +61,45 @@ topics:
         type: camera-event
 
 services:
+   
+  # receive label request from core and put into label-request state
+  receive-label-request:
+    source:
+      - type: topic
+        id: label-request
+
+    states:
+      label-request:
+        type: keyed-state
+        properties:
+          key:
+            type: string
+          value:
+            type: arrow-row
+            properties:
+              confidence:
+                type: f32
+              label:
+                type: string
+
+    partition:
+      assign-key:
+        run: |
+          fn assign_key_word(word: String) -> Result<String> {
+            Ok(word.to_lowercase().chars().filter(|c| c.is_alphanumeric()).collect())
+          }
+
+      update-state:
+        run: |
+          fn process_label_request(request: LabelRequest) -> Result<()> {
+            let mut state = label_request();
+            println!("{:?}", state);
+            state.label = request.label;
+            state.confidence = rqeust.confidence;
+            state.update();
+            Ok(())
+          }
+
   pre-process:
     sources:
       - type: topic

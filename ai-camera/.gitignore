@@ -1,3 +1,4 @@
 fluvio
 *.jpg
 __*
+edge*.json
