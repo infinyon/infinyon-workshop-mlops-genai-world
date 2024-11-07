@@ -1,5 +1,6 @@
 EDGEHOME = edge1-home.json
-HOME_CLUSTER = mlcore
+#HOME_CLUSTER = mlcore
+HOME_CLUSTER = local
 EDGE_CLUSTER = local
 FL_VERSION = 0.13.0-dev-3
 

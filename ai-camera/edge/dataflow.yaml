@@ -131,7 +131,15 @@ services:
                Ok(false)
             }
           }
+      - operator: map
+        run: |
+          fn inject_edge(camera: CameraEvent) -> Result<EdgeObject> {
+              Ok(EdgeObject {
+                 camera,
+                 device: "imx500".to_string()
+              })
+          }
 
     sinks:
       - type: topic
-        id: output-labels
+        id: edge-outputs
