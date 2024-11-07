@@ -1,17 +1,11 @@
 EDGEHOME = edge1-home.json
-#HOME_CLUSTER = mlcore
-HOME_CLUSTER = local
+HOME_CLUSTER = mlcore
+# HOME_CLUSTER = local
 EDGE_CLUSTER = local
 FL_VERSION = 0.13.0-dev-3
 
 INPUT_TOPIC=input-labels 
 OUTPUT_TOPIC=edge-outputs
-
-
-
-download_edge:
-	fluvio cloud remote export edge1 --file $(EDGEHOME)
-
 
 
 setup_python:
@@ -25,9 +19,11 @@ create-cloud-cluster:
 
 setup-home:
 	fluvio --profile $(HOME_CLUSTER) remote register edge1
+	fluvio --profile $(HOME_CLUSTER) remote register edge2
 
 exp-remote:
-	fluvio cloud remote export edge1  --file edge1-home.json
+	fluvio cloud remote export edge1  --file ../edge/edge1-home.json
+	fluvio cloud remote export edge2  --file ../edge/edge2-home.json
 
 
 create-home-topics:

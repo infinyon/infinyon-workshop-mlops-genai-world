@@ -11,10 +11,10 @@ OUTPUT_TOPIC=edge-outputs
 connect-home:
 	fluvio --profile $(EDGE_CLUSTER) home connect --file $(EDGEHOME)
 
-edge-status:
+edge1-status:
 	fluvio --profile $(EDGE_CLUSTER) home status
 
-list-edge-topics:
+list-edge1-topics:
 	fluvio --profile $(EDGE_CLUSTER) topic list
 
 input_mouse:
