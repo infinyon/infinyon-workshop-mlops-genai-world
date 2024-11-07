@@ -11,7 +11,6 @@ config:
       value: 0
       position: End
 
-  
 types:
   camera-event:
     type: object
@@ -39,12 +38,9 @@ types:
       count:
         type: u32
 
-
-
 topics:
-
-  label-request:
-    name: label-request
+  input-labels:
+    name: input-labels
     schema:
       value:
         type: label-request
@@ -61,15 +57,14 @@ topics:
         type: camera-event
 
 services:
-   
   # receive label request from core and put into label-request state
   receive-label-request:
-    source:
+    sources:
       - type: topic
-        id: label-request
+        id: input-labels
 
     states:
-      label-request:
+      labels:
         type: keyed-state
         properties:
           key:
@@ -85,17 +80,17 @@ services:
     partition:
       assign-key:
         run: |
-          fn assign_key_word(word: String) -> Result<String> {
-            Ok(word.to_lowercase().chars().filter(|c| c.is_alphanumeric()).collect())
+          fn assign_key(input: LabelRequest) -> Result<String> {
+            Ok(input.label)
           }
 
       update-state:
         run: |
           fn process_label_request(request: LabelRequest) -> Result<()> {
-            let mut state = label_request();
+            let mut state = labels();
             println!("{:?}", state);
             state.label = request.label;
-            state.confidence = rqeust.confidence;
+            state.confidence = request.confidence;
             state.update();
             Ok(())
           }
@@ -107,9 +102,9 @@ services:
     transforms:
       - operator: filter
         run: |
-            fn high_confidence(event: CameraEvent) -> Result<bool> {
-              Ok(event.confidence > 0.7)
-            }
+          fn high_confidence(event: CameraEvent) -> Result<bool> {
+            Ok(event.confidence > 0.7)
+          }
     sinks:
       - type: topic
         id: filter-object

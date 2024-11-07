@@ -48,3 +48,10 @@ clean-home-topics:
 demo:
 	source fluvio/bin/activate
 	python demo.py
+
+
+label_mouse:
+	fluvio --profile $(HOME_CLUSTER) produce input-labels --file requests/mouse.json --raw
+
+label_person:
+	fluvio --profile $(HOME_CLUSTER) produce input-labels --file requests/person.json --raw
