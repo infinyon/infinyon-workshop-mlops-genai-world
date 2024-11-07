@@ -11,6 +11,11 @@ download_edge:
 connect-home:
 	fluvio --profile $(EDGE_CLUSTER) home connect --file $(EDGEHOME)
 
+edge-status:
+	fluvio --profile $(EDGE_CLUSTER) home status
+
+list-edge-topics:
+	fluvio --profile $(EDGE_CLUSTER) topic list
 
 
 setup_python:
@@ -33,7 +38,12 @@ create-home-topics:
 	fluvio --profile $(HOME_CLUSTER) topic create input-labels --mirror-apply mirror.json --home-to-remote
 	fluvio --profile $(HOME_CLUSTER) topic create output-labels --mirror-apply mirror.json
 
+list-home-topics:
+	fluvio --profile $(HOME_CLUSTER) topic list
 
+clean-home-topics:
+	fluvio --profile $(HOME_CLUSTER) topic delete input-labels
+	fluvio --profile $(HOME_CLUSTER) topic delete output-labels
 
 demo:
 	source fluvio/bin/activate
