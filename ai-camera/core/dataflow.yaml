@@ -1,0 +1,110 @@
+apiVersion: 0.5.0
+meta:
+  name: object-processing-core
+  version: 0.1.0
+  namespace: demo
+
+config:
+  converter: json
+  consumer:
+    default_starting_offset:
+      value: 0
+      position: End
+
+types:
+  camera-event:
+    type: object
+    properties:
+      label:
+        type: string
+      confidence:
+        type: f32
+      time:
+        type: string
+
+  label-request:
+    type: object
+    properties:
+      label:
+        type: string
+      confidence:
+        type: f32
+
+  label-confidence-output:
+    type: arrow-row
+    properties:
+      avg-confidence:
+        type: f32
+      count:
+        type: u32
+
+  edge-object:
+    type: object
+    properties:
+      camera:
+        type: camera-event
+      device:
+        type: string
+
+topics:
+  input-labels:
+    name: input-labels
+    schema:
+      value:
+        type: label-request
+
+  edge-outputs:
+    name: edge-outputs
+    schema:
+      value:
+        type: edge-object
+
+services:
+  aggregate:
+    sources:
+      - type: topic
+        id: edge-outputs
+
+    states:
+      objects:
+        type: keyed-state
+        properties:
+          key:
+            type: string
+          value:
+            type: arrow-row
+            properties:
+              person:
+                type: u16
+              mouse:
+                type: u16
+              cat:
+                type: u16
+              other:
+                type: u16
+
+    partition:
+      assign-key:
+        run: |
+          fn assign_key(input: EdgeObject) -> Result<String> {
+            Ok(input.device)
+          }
+
+      update-state:
+        run: |
+          fn count_objects(input: EdgeObject) -> Result<()> {
+            let mut state = objects();
+            println!("{:?}", state);
+            let cam_obj = input.camera;
+            if cam_obj.label == "person" {
+              state.person += 1;
+            } else if cam_obj.label == "mouse" {
+              state.mouse += 1;
+            } else if cam_obj.label == "cat" {
+              state.cat += 1 ;
+            } else {
+              state.other += 1;
+            }
+            state.update()?;
+            Ok(())
+          }

@@ -1,6 +1,6 @@
 apiVersion: 0.5.0
 meta:
-  name: object-processing
+  name: object-processing-edge
   version: 0.1.0
   namespace: demo
 
@@ -38,6 +38,15 @@ types:
       count:
         type: u32
 
+  edge-object:
+    type: object
+    properties:
+      camera:
+        type: camera-event
+      device:
+        type: string
+
+
 topics:
   input-labels:
     name: input-labels
@@ -50,11 +59,12 @@ topics:
     schema:
       value:
         type: camera-event
-  output-labels:
-    name: output-labels
+
+  edge-outputs:
+    name: edge-outputs
     schema:
       value:
-        type: camera-event
+        type: edge-object
 
 services:
   # receive label request from core and put into label-request state
@@ -121,7 +131,15 @@ services:
                Ok(false)
             }
           }
+      - operator: map
+        run: |
+          fn inject_edge(camera: CameraEvent) -> Result<EdgeObject> {
+              Ok(EdgeObject {
+                 camera,
+                 device: "imx500".to_string()
+              })
+          }
 
     sinks:
       - type: topic
-        id: output-labels
+        id: edge-outputs
