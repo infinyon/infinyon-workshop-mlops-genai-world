@@ -1,5 +1,6 @@
 EDGEHOME = edge1-home.json
 HOME_CLUSTER = mldemo
+EDGE_CLUSTER = local
 
 setup_fluvio:
 	fluvio topic create objects
@@ -8,7 +9,9 @@ download_edge:
 	fluvio cloud remote export edge1 --file $(EDGEHOME)
 
 connect-home:
-	fluvio home connect --file $(EDGEHOME)
+	fluvio --profile $(EDGE_CLUSTER) home connect --file $(EDGEHOME)
+
+
 
 setup_python:
 	python3 -m venv fluvio --system-site-packages
