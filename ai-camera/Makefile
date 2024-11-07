@@ -1,6 +1,7 @@
 EDGEHOME = edge1-home.json
-HOME_CLUSTER = mldemo
+HOME_CLUSTER = mlcore
 EDGE_CLUSTER = local
+FL_VERSION = 0.13.0-dev-3
 
 setup_fluvio:
 	fluvio topic create objects
@@ -25,7 +26,7 @@ setup_python:
 
 
 create-cloud-cluster:
-	fluvio cloud cluster create mldemo --version 0.13.0-dev-2
+	fluvio cloud cluster create $(HOME_CLUSTER) --version $(FL_VERSION)
 
 setup-home:
 	fluvio --profile $(HOME_CLUSTER) remote register edge1

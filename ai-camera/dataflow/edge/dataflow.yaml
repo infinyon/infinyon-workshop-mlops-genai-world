@@ -1,6 +1,6 @@
 apiVersion: 0.5.0
 meta:
-  name: object-processing
+  name: object-processing-edge
   version: 0.1.0
   namespace: demo
 
