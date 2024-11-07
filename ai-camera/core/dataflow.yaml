@@ -1,0 +1,127 @@
+apiVersion: 0.5.0
+meta:
+  name: object-processing-core
+  version: 0.1.0
+  namespace: demo
+
+config:
+  converter: json
+  consumer:
+    default_starting_offset:
+      value: 0
+      position: End
+
+types:
+  camera-event:
+    type: object
+    properties:
+      label:
+        type: string
+      confidence:
+        type: f32
+      time:
+        type: string
+
+  label-request:
+    type: object
+    properties:
+      label:
+        type: string
+      confidence:
+        type: f32
+
+  label-confidence-output:
+    type: arrow-row
+    properties:
+      avg-confidence:
+        type: f32
+      count:
+        type: u32
+
+topics:
+  input-labels:
+    name: input-labels
+    schema:
+      value:
+        type: label-request
+
+  input-object:
+    name: input-objects
+    schema:
+      value:
+        type: camera-event
+  output-labels:
+    name: output-labels
+    schema:
+      value:
+        type: camera-event
+
+services:
+  # receive label request from core and put into label-request state
+  receive-label-request:
+    sources:
+      - type: topic
+        id: input-labels
+
+    states:
+      labels:
+        type: keyed-state
+        properties:
+          key:
+            type: string
+          value:
+            type: arrow-row
+            properties:
+              confidence:
+                type: f32
+              label:
+                type: string
+
+    partition:
+      assign-key:
+        run: |
+          fn assign_key(input: LabelRequest) -> Result<String> {
+            Ok(input.label)
+          }
+
+      update-state:
+        run: |
+          fn process_label_request(request: LabelRequest) -> Result<()> {
+            let mut state = labels();
+            println!("{:?}", state);
+            state.label = request.label;
+            state.confidence = request.confidence;
+            state.update()?;
+            Ok(())
+          }
+
+  aggregate:
+    sources:
+      - type: topic
+        id: input-object
+    states:
+      labels:
+        from: receive-label-request.labels
+    transforms:
+      - operator: filter
+        run: |
+          fn high_confidence(event: CameraEvent) -> Result<bool> {
+            Ok(event.confidence > 0.7)
+          }
+      - operator: filter
+        run: |
+          fn check_label(event: CameraEvent) -> Result<bool> {
+            let df = labels();
+            let key = event.label;
+            let count = df.sql(&format!("select * from `labels` where _key = '{}'", key))?;
+            let rows = count.rows()?;
+            if rows.next()  {
+               Ok(true)
+            } else {
+               Ok(false)
+            }
+          }
+
+    sinks:
+      - type: topic
+        id: output-labels

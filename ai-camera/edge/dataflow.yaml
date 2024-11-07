@@ -38,6 +38,15 @@ types:
       count:
         type: u32
 
+  edge-object:
+    type: object
+    properties:
+      camera:
+        type: camera-event
+      device:
+        type: string
+
+
 topics:
   input-labels:
     name: input-labels
@@ -50,11 +59,12 @@ topics:
     schema:
       value:
         type: camera-event
-  output-labels:
-    name: output-labels
+
+  edge-outputs:
+    name: edge-outputs
     schema:
       value:
-        type: camera-event
+        type: edge-object
 
 services:
   # receive label request from core and put into label-request state

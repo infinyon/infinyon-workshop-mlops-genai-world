@@ -3,6 +3,9 @@ HOME_CLUSTER = mlcore
 EDGE_CLUSTER = local
 FL_VERSION = 0.13.0-dev-3
 
+INPUT_TOPIC=input-labels 
+OUTPUT_TOPIC=edge-outputs
+
 setup_fluvio:
 	fluvio topic create objects
 
@@ -36,15 +39,15 @@ exp-remote:
 
 
 create-home-topics:
-	fluvio --profile $(HOME_CLUSTER) topic create input-labels --mirror-apply mirror.json --home-to-remote
-	fluvio --profile $(HOME_CLUSTER) topic create output-labels --mirror-apply mirror.json
+	fluvio --profile $(HOME_CLUSTER) topic create $(INPUT_TOPIC) --mirror-apply mirror.json --home-to-remote
+	fluvio --profile $(HOME_CLUSTER) topic create $(OUTPUT_TOPIC) --mirror-apply mirror.json
 
 list-home-topics:
 	fluvio --profile $(HOME_CLUSTER) topic list
 
 clean-home-topics:
-	fluvio --profile $(HOME_CLUSTER) topic delete input-labels
-	fluvio --profile $(HOME_CLUSTER) topic delete output-labels
+	fluvio --profile $(HOME_CLUSTER) topic delete $(INPUT_TOPIC)
+	fluvio --profile $(HOME_CLUSTER) topic delete $(OUTPUT_TOPIC)
 
 demo:
 	source fluvio/bin/activate
@@ -58,8 +61,3 @@ label_person:
 	fluvio --profile $(HOME_CLUSTER) produce input-labels --file requests/person.json --raw
 
 
-input_mouse:
-	fluvio --profile $(EDGE_CLUSTER) produce input-objects --file capture/mouse.json --raw
-
-input_person:
-	fluvio --profile $(EDGE_CLUSTER) produce input-objects --file capture/person.json --raw
