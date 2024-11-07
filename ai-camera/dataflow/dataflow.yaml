@@ -108,6 +108,19 @@ services:
           fn high_confidence(event: CameraEvent) -> Result<bool> {
             Ok(event.confidence > 0.7)
           }
+      - operator: filter
+        run: |
+          fn check_label(event: CameraEvent) -> Result<bool> {
+            let df = labels();
+            let key = event.label;
+            let count = df.sql(&format!("select * from `labels` where _key = '{}'", key))?;
+            let rows = count.rows()?;
+            if rows.next()  {
+               Ok(true)
+            } else {
+               Ok(false)
+            }
+          }
 
     sinks:
       - type: topic

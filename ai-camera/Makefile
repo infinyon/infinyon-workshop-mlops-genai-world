@@ -55,3 +55,10 @@ label_mouse:
 
 label_person:
 	fluvio --profile $(HOME_CLUSTER) produce input-labels --file requests/person.json --raw
+
+
+input_mouse:
+	fluvio --profile $(EDGE_CLUSTER) produce input-objects --file capture/mouse.json --raw
+
+input_person:
+	fluvio --profile $(EDGE_CLUSTER) produce input-objects --file capture/person.json --raw
