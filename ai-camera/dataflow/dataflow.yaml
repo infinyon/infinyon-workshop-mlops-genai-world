@@ -50,8 +50,8 @@ topics:
     schema:
       value:
         type: camera-event
-  filter-object:
-    name: high-objects
+  output-labels:
+    name: output-labels
     schema:
       value:
         type: camera-event
@@ -91,7 +91,7 @@ services:
             println!("{:?}", state);
             state.label = request.label;
             state.confidence = request.confidence;
-            state.update();
+            state.update()?;
             Ok(())
           }
 
@@ -99,12 +99,16 @@ services:
     sources:
       - type: topic
         id: input-object
+    states:
+      labels:
+        from: receive-label-request.labels
     transforms:
       - operator: filter
         run: |
           fn high_confidence(event: CameraEvent) -> Result<bool> {
             Ok(event.confidence > 0.7)
           }
+
     sinks:
       - type: topic
-        id: filter-object
+        id: output-labels
